@@ -19,10 +19,9 @@ function sync_sorted_merge(logSources, printer) {
     // we add entries from logSource[i] until its date is > logSource[i+1].last.date
     const source = logSources[i];
     const cutoff_date = logSources[i + 1].last.date;
-    while (!source.drained && source.last.date <= cutoff_date) {
+    while (!source.drained && source.last.date < cutoff_date) {
       // add earliest entry to sorted array
-			// sorted.push(source.last);
-			printer.print(source.last)
+      sorted.push(source.last);
       // pop the added entry to get to the next entry for this source
       source.pop();
     }
@@ -37,7 +36,7 @@ function sync_sorted_merge(logSources, printer) {
       // 	in this case we do NOT increment i and instead we continue with same value of i
     } else {
       // resortLogSources(logSources, i)
-      let j = i;
+      let j = i + 1;
       // find swap index
       while (
         j < logSources.length - 1 &&
@@ -45,22 +44,20 @@ function sync_sorted_merge(logSources, printer) {
       ) {
         j++;
 			}
-			// console.log(i, j)
       const temp = logSources[i];
       logSources[i] = logSources[j];
       logSources[j] = temp;
     }
   }
-	console.log(i)
+
   // at this point (once we break out of main while loop) we know that the only remaining entries are all from the source at the end of logSources
   const lastSource = logSources[logSources.length - 1];
   while (!lastSource.drained) {
-		// sorted.push(lastSource.last);
-		printer.print(lastSource.last)
+    sorted.push(lastSource.last);
     lastSource.pop();
   }
   // this completes the required printing of sorted entries
-  // sorted.forEach((source) => printer.print(source));
+  sorted.forEach((source) => printer.print(source));
   // performs a check on our solution's print order and gives an idea of efficiency
   printer.done();
   return console.log("Sync sort complete.");
