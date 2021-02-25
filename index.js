@@ -56,4 +56,22 @@ function runSolutions(sourceCount) {
 }
 
 // Adjust this input to see how your solutions perform under various loads.
-runSolutions(100);
+// runSolutions(100);
+
+
+// a function to test how high we can go without crashing...
+// 	   	 		N:  1     10      100     1,000    10,000   100,000   1,000,000
+//  sync time:  0     0.017   0.385   34
+//  sync rate:  Inf   146k    64k     7,081
+// async time:  1     10      108     1,120
+// async rate:  223   223     225     215
+async function runSolutionsLoop(N) {
+  let n = 1;
+  while (n < N) {
+    console.log(`\n\n---------------------------------------------------------\nN = ${n}`);
+    await runSolutions(n);
+    n *= 10;
+  }
+}
+
+runSolutionsLoop(1000000);

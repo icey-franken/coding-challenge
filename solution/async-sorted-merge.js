@@ -19,7 +19,7 @@ async function asyncSortedMerge(logSources, printer) {
       await source.popAsync();
     }
     // if a source is drained, move on to the next source in logSources by incrementing i
-    // otherwise we need to "resort" logSources (swap source at i with source at i + 1 until order is restored)
+    // otherwise we need to "resort" logSources (swap source at i with source at i + 1 until order is restored) and repeat outer while loop with same i
     source.drained ? i++ : resortLogSources(logSources, i);
 	}
 
