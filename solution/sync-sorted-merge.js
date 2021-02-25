@@ -3,66 +3,51 @@
 // Print all entries, across all of the sources, in chronological order.
 
 function sync_sorted_merge(logSources, printer) {
-  let sorted = [];
   // sort initial logSources array from earliest to latest
   logSources.sort((a, b) => (a.last.date > b.last.date ? 1 : -1));
-  // console.log(
-  //   "---------------------------\nlogSources: \n",
-  //   logSources,
-  //   "\nend log sources\n---------------------------"
-  // );
+  const len = logSources.length;
   let i = 0;
   // iterate from 0 to length - 1.
   // NOTE: we go to length -1 because at the last entry we can just fill our sorted array (there is nothing to compare to)
-  while (i < logSources.length - 1) {
-    // we know that logSources[i] is the earliest entry
-    // we add entries from logSource[i] until its date is > logSource[i+1].last.date
+  while (i < len) {
+    // the first entry at logSources[i] is guaranteed to always be our earliest entry
     const source = logSources[i];
-    const cutoff_date = logSources[i + 1].last.date;
+    // conditionally define our cutoff date to handle the case where logSources[i+1] is undefined
+    const cutoff_date = i + 1 < len ? logSources[i + 1].last.date : Infinity;
+    // we print each entry from the current source until the source is drained or the source date is greater than the cutoff date (defined by date at logSources[i+1])
     while (!source.drained && source.last.date <= cutoff_date) {
-      // add earliest entry to sorted array
-			// sorted.push(source.last);
-			printer.print(source.last)
-      // pop the added entry to get to the next entry for this source
+      // print earliest entry
+      printer.print(source.last);
+      // call the pop method to move to the next entry in source
       source.pop();
     }
 
-    // if a source is drained, then we can move on to the next entry: i ++
+    // if a source is drained, then we can move on to the next source in logSources by incrementing i
     // 	in this way we move past drained sources as they no longer matter
-    if (source.drained) {
-      i++;
-      // else if a source is not drained then we need to resort it - we do this with insertion.
-      // 	iterate from j = i + 1 to logSources.length to find swap index
-      // 	swap current source with source at swap index
-      // 	in this case we do NOT increment i and instead we continue with same value of i
-    } else {
-      // resortLogSources(logSources, i)
-      let j = i;
-      // find swap index
-      while (
-        j < logSources.length - 1 &&
-        logSources[j+1].last.date < source.last.date
-      ) {
-        j++;
-			}
-			// console.log(i, j)
-      const temp = logSources[i];
-      logSources[i] = logSources[j];
-      logSources[j] = temp;
-    }
+    // otherwise if a source is not drained, then we need to "resort" logSources
+    // 	swap source at i with source at i + 1 until order is restored
+    source.drained ? i++ : resortLogSources(logSources, i);
   }
-  // at this point (once we break out of main while loop) we know that the only remaining entries are all from the source at the end of logSources
-  const lastSource = logSources[logSources.length - 1];
-  while (!lastSource.drained) {
-		// sorted.push(lastSource.last);
-		printer.print(lastSource.last)
-    lastSource.pop();
-  }
-  // this completes the required printing of sorted entries
-  // sorted.forEach((source) => printer.print(source));
-  // performs a check on our solution's print order and gives an idea of efficiency
   printer.done();
   return console.log("Sync sort complete.");
+}
+
+// a "bubble sort" for a single value (at index i) out of place in an otherwise sorted array
+function resortLogSources(logSources, i) {
+  let j = i;
+  while (
+    j < logSources.length - 1 &&
+    logSources[j + 1].last.date < logSources[j].last.date
+  ) {
+    swap(logSources, j, j + 1);
+    j++;
+  }
+}
+
+function swap(logSources, idx1, idx2) {
+  const temp = logSources[idx1];
+  logSources[idx1] = logSources[idx2];
+  logSources[idx2] = temp;
 }
 
 module.exports = sync_sorted_merge;
