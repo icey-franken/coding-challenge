@@ -51,7 +51,6 @@ function sync_sorted_merge(logSources, printer) {
       logSources[j] = temp;
     }
   }
-	console.log(i)
   // at this point (once we break out of main while loop) we know that the only remaining entries are all from the source at the end of logSources
   const lastSource = logSources[logSources.length - 1];
   while (!lastSource.drained) {
